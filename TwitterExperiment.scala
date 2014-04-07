@@ -15,8 +15,14 @@ object TwitterExperiment {
     // new Twitter Stream
     val tweets = ssc.twitterStream()
 
-    // transform the statuses dstream to get hashTags dstream
-    val statuses = tweets.map(status => "@" + status.getUser().getScreenName() + ": " + status.getText())
+    val word = if (args.length > 0) args(0) else ""
+
+    println("filtering by word: " + word)
+
+    // process
+    val containingHashTags = tweets.filter(_.getText().contains(word))
+
+    val statuses = containingHashTags.map(status => "@" + status.getUser().getScreenName() + ": " + status.getText())
         statuses.print()
 
     ssc.checkpoint(checkPointDir)
